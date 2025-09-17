@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 
 # ---------- SaaS-like theming (soft cards, rounded corners) ----------
-st.set_page_config(page_title="ExecuNote — AI 협업 노트", page_icon="🧠", layout="wide")
+st.set_page_config(page_title="ActionNote — AI 협업 노트", page_icon="🧠", layout="wide")
 
 CSS = """
 <style>
