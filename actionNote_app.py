@@ -3,76 +3,42 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
 
-# ---------- SaaS-like theming (soft cards, rounded corners) ----------
-st.set_page_config(page_title="ActionNote — AI 협업 노트", page_icon="🧠", layout="wide")
+# ---------- SaaS-like theming ----------
+st.set_page_config(page_title="ActionNote — AI 협업 노트", page_icon="📌", layout="wide")
 
 CSS = """
 <style>
 :root {
   --bg:#0b1220;
   --card:#11192a;
-  --muted:#9fb0c0;
   --text:#e8eef6;
   --accent:#7aa2ff;
   --accent-2:#00d4ff;
 }
-/* App background */
 main, .stApp { background: linear-gradient(180deg, var(--bg) 0%, #0f172a 100%); color: var(--text); }
-section.main > div { padding-top: 1rem; }
-/* Sidebar */
-[data-testid="stSidebar"] {
-  background: linear-gradient(180deg, #0d1426 0%, #0b1220 100%);
-  border-right: 1px solid #1f2a44;
-}
-/* Headline gradient */
-.grad {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-/* Card */
-.card {
-  background: var(--card);
-  border: 1px solid #1f2a44;
-  border-radius: 16px;
-  padding: 18px 20px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-}
-/* Buttons */
-.stButton>button {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  border: 0;
-  color: #0b1220;
-  font-weight: 700;
-  border-radius: 12px;
-  padding: 0.6rem 1rem;
-}
-/* Inputs */
-.stTextArea textarea, .stTextInput input {
-  background: #0d1528;
-  color: var(--text);
-  border: 1px solid #20304c;
-  border-radius: 12px;
-}
-/* Tables */
-.dataframe th, .dataframe td { color: #dbe7f3 !important; }
+[data-testid="stSidebar"] { background: linear-gradient(180deg, #0d1426, #0b1220); border-right: 1px solid #1f2a44; }
+.grad { background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.card { background: var(--card); border: 1px solid #1f2a44; border-radius: 16px; padding: 18px 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+.stButton>button { background: linear-gradient(90deg, var(--accent), var(--accent-2)); border:0; color:#0b1220; font-weight:700; border-radius:12px; padding:.6rem 1rem; }
+.stTextArea textarea, .stTextInput input { background:#0d1528; color:var(--text); border:1px solid #20304c; border-radius:12px; }
+.dataframe th, .dataframe td { color:#dbe7f3 !important; }
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
 
 # ---------- Sidebar ----------
 with st.sidebar:
-    st.markdown("### 🧠 ExecuNote")
+    st.markdown("### 📌 ActionNote")
     st.caption("회의 → 요약/결정/액션 → 메일/캘린더")
     st.divider()
     st.markdown("**입력 소스**")
     input_mode = st.radio("", ["텍스트 붙여넣기", "파일 업로드(.txt/.md/.docx/.pdf)", "노트 사진(OCR) — 데모용 텍스트"], label_visibility="collapsed")
     st.divider()
-    st.caption("⚡ 데모용 빠른 가이드")
-    st.markdown("- 좌측에서 입력 방식 선택\n- 중앙에서 텍스트/파일 업로드\n- 우측 탭에서 요약/결정/액션/메일 미리보기 확인\n- 아래에서 .ics(일정) 내려받기")
+    st.caption("⚡ 데모 가이드")
+    st.markdown("- 입력 선택 → 텍스트/파일 업로드\n- 결과 탭에서 요약/결정/액션/메일 확인\n- 아래에서 .ics(일정) 내려받기")
 
-st.markdown("<h1 class='grad'>ExecuNote — AI 협업 노트 (SaaS Prototype)</h1>", unsafe_allow_html=True)
-st.markdown("<div class='card'>회의 메모/자료를 입력하면, 요약·결정·액션 테이블과 메일 초안을 생성하고, 빈 시간대 추천을 통해 일정(.ics)까지 만듭니다.</div>", unsafe_allow_html=True)
+st.markdown("<h1 class='grad'>ActionNote — AI 협업 노트 (SaaS Prototype)</h1>", unsafe_allow_html=True)
+st.markdown("<div class='card'>회의 메모/자료를 입력하면, 요약·결정·액션 테이블과 메일 초안을 생성하고, 추천 시간대 선택으로 일정(.ics)까지 만듭니다.</div>", unsafe_allow_html=True)
 st.write("")
 
 colL, colR = st.columns([1.2, 1])
@@ -88,7 +54,6 @@ with colL:
             raw_text = up.read().decode("utf-8","ignore")
             st.success(f"업로드 완료: {up.name}")
     else:
-        # 데모용 텍스트 (OCR 대체)
         raw_text = st.text_area("노트 사진(OCR) 데모 — 텍스트 입력", height=200, value="안건: 신규 기능 A 논의\n- 발언자A: 와이어프레임 필요\n- 발언자B: 경쟁사 B 리서치\n결정: 다음 주까지 WF 시안, 리서치 1건\n마감: WF(2주), 리서치(1주)")
 
     st.subheader("② 파라미터")
@@ -125,7 +90,7 @@ date = st.date_input("시작 날짜", datetime.today())
 slot_choice = st.selectbox("추천 슬롯(데모)", ["09:00-09:30","10:00-11:00","14:00-15:00"])
 download_ics = st.button("📅 .ics 생성")
 
-# ---------- Generation logic (stubbed, deterministic demo) ----------
+# ---------- Generation logic (demo stubs) ----------
 def generate_docs(text:str, dur_min:int, deadline_days:int):
     if not text.strip():
         return ("### 회의 요약\n- (입력 없음)\n",
@@ -133,7 +98,6 @@ def generate_docs(text:str, dur_min:int, deadline_days:int):
                 pd.DataFrame(columns=["업무","담당","기한","우선순위"]),
                 "# 메일 초안\n\n(입력 없음)")
 
-    # Naive parse (demo): craft sample outputs
     summary = "### 회의 요약\n- 신규 기능 A 와이어프레임 필요\n- 경쟁사 B 리서치 진행\n- 다음 주 중 1차 검토 미팅\n"
     decisions = "### 결정 사항\n- WF 시안 1주 내 공유\n- 경쟁사 리서치 1건 수집\n- 다음 회의 전 개발 기술 검토\n"
     ddl1 = (datetime.today() + timedelta(days=deadline_days)).strftime("%Y-%m-%d")
@@ -179,15 +143,15 @@ if go:
     st.success("문서 생성 완료! 우측 탭에서 확인하세요.")
 
 # ---------- ICS creation (demo) ----------
-def make_ics(date_str:str, timestr:str, title="ExecuNote Action"):
+def make_ics(date_str:str, timestr:str, title="ActionNote Action"):
     start, end = timestr.split("-")
     dt = datetime.strptime(f"{date_str} {start}", "%Y-%m-%d %H:%M")
     dt_end = datetime.strptime(f"{date_str} {end}", "%Y-%m-%d %H:%M")
     ics = f"""BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//ExecuNote//SaaS Prototype//EN
+PRODID:-//ActionNote//SaaS Prototype//EN
 BEGIN:VEVENT
-UID:{datetime.utcnow().timestamp()}@execunote
+UID:{datetime.utcnow().timestamp()}@actionnote
 DTSTAMP:{datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")}
 DTSTART:{dt.strftime("%Y%m%dT%H%M%S")}
 DTEND:{dt_end.strftime("%Y%m%dT%H%M%S")}
@@ -199,4 +163,4 @@ END:VCALENDAR"""
 
 if download_ics:
     ics_text = make_ics(date.strftime("%Y-%m-%d"), slot_choice, "액션 수행 시간")
-    st.download_button("📥 .ics 파일 다운로드", data=ics_text, file_name="execunote_action.ics", mime="text/calendar")
+    st.download_button("📥 .ics 파일 다운로드", data=ics_text, file_name="actionnote_action.ics", mime="text/calendar")
